@@ -5,133 +5,325 @@
   <title>Simulación de Seguridad</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:       #C0392B;
+      --red-light: #FDEEEC;
+      --red-mid:   #F5B7B1;
+      --green:     #1D6A45;
+      --green-bg:  #EBF5EE;
+      --amber:     #7D5A0A;
+      --amber-bg:  #FEF9EC;
+      --amber-mid: #F9DFA0;
+      --gray-900:  #1A1A1A;
+      --gray-600:  #4A4A4A;
+      --gray-400:  #888;
+      --gray-100:  #F2F2F0;
+      --gray-50:   #F8F8F7;
+      --border:    #E5E5E3;
+      --white:     #FFFFFF;
+    }
+
     body {
       font-family: 'DM Sans', sans-serif;
-      background: #f2f2f0;
+      background-color: var(--gray-100);
+      min-height: 100vh;
       display: flex;
+      align-items: flex-start;
       justify-content: center;
-      padding: 30px;
+      padding: 32px 16px 48px;
+      color: var(--gray-900);
     }
-    .container {
-      max-width: 500px;
-      width: 100%;
-    }
-    .alert {
-      background: #C0392B;
-      color: white;
-      padding: 20px;
-      border-radius: 12px;
+
+    .page { width: 100%; max-width: 520px; }
+
+    .alert-banner {
+      background: var(--red);
+      border-radius: 16px;
+      padding: 28px 24px;
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+      animation: slideDown 0.4s ease both;
     }
+    .alert-banner::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .alert-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -30px; left: -30px;
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .alert-icon { font-size: 36px; margin-bottom: 10px; display: block; }
+    .alert-banner h1 {
+      font-size: 22px; font-weight: 600; color: #fff;
+      margin-bottom: 6px; letter-spacing: -0.3px;
+    }
+    .alert-banner p { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.5; }
+
     .card {
-      background: white;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
       padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
+      margin-bottom: 12px;
+      animation: fadeUp 0.4s ease both;
     }
-    .btn-group {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+    .card:nth-child(2) { animation-delay: 0.05s; }
+    .card:nth-child(3) { animation-delay: 0.10s; }
+    .card:nth-child(4) { animation-delay: 0.15s; }
+
+    .card-title {
+      font-size: 13px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--gray-400); margin-bottom: 14px;
     }
-    button {
-      padding: 10px 15px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      cursor: pointer;
+
+    .check-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .check-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--gray-600); line-height: 1.5;
     }
-    .selected {
-      background: #FEF9EC;
-      border-color: #F9DFA0;
+    .bullet {
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px; font-size: 11px;
     }
-    .report {
-      width: 100%;
-      margin-top: 15px;
-      background: #FDEEEC;
-      border: 1px solid #F5B7B1;
-      color: #C0392B;
+    .bullet-green { background: var(--green-bg); color: var(--green); font-size: 13px; }
+    .bullet-red   { background: var(--red-light); color: var(--red); font-size: 13px; }
+
+    .question-label {
+      font-size: 14px; font-weight: 500;
+      color: var(--gray-900); margin-bottom: 12px;
     }
-    .success {
+    .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .reason-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 500;
+      padding: 9px 16px; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--gray-50); color: var(--gray-600);
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .reason-btn:hover { background: var(--gray-100); border-color: #ccc; }
+    .reason-btn.selected {
+      background: var(--amber-bg);
+      border-color: var(--amber-mid);
+      color: var(--amber);
+    }
+
+    .report-btn {
+      font-family: 'DM Sans', sans-serif;
+      width: 100%; padding: 13px; border-radius: 10px;
+      border: 1px solid var(--red-mid);
+      background: var(--red-light); color: var(--red);
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .report-btn:hover { background: #FAD9D5; }
+    .report-btn:active { transform: scale(0.99); }
+    .report-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .footer-note {
+      text-align: center; font-size: 13px; color: var(--green);
+      background: var(--green-bg); border: 1px solid #B7DFC8;
+      border-radius: 10px; padding: 12px 16px; margin-top: 4px;
+      animation: fadeUp 0.4s ease 0.2s both;
+    }
+
+    .success-msg {
       display: none;
-      color: green;
-      margin-top: 10px;
+      text-align: center;
+      padding: 16px;
+      background: var(--green-bg);
+      border: 1px solid #B7DFC8;
+      border-radius: 10px;
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 500;
+      margin-top: 12px;
+    }
+    .success-msg.show { display: block; animation: fadeUp 0.3s ease both; }
+
+    .toast {
+      display: none;
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--gray-900); color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 500;
+      padding: 10px 20px; border-radius: 100px;
+      white-space: nowrap; z-index: 999;
+    }
+    .toast.show { display: block; animation: toastIn 0.25s ease forwards; }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    @media (max-width: 400px) {
+      .alert-banner h1 { font-size: 19px; }
+      .reason-btn { font-size: 12px; padding: 8px 13px; }
     }
   </style>
 </head>
-
 <body>
+  <div class="page">
 
-<div class="container">
-
-  <div class="alert">
-    <h2>⚠️ Esta fue una simulación</h2>
-    <p>Escaneaste un QR no verificado</p>
-  </div>
-
-  <div class="card">
-    <p><strong>¿Por qué escaneaste?</strong></p>
-
-    <div class="btn-group">
-      <button onclick="sendReason(this,'legitimo')">Me pareció legítimo</button>
-      <button onclick="sendReason(this,'urgencia')">Tenía urgencia</button>
-      <button onclick="sendReason(this,'curiosidad')">Me llamó la atención</button>
+    <div class="alert-banner">
+      <span class="alert-icon">⚠️</span>
+      <h1>Esta fue una simulación</h1>
+      <p>Acabás de escanear un código QR no verificado.</p>
     </div>
 
-    <button class="report" onclick="sendReport()">Reportar intento sospechoso</button>
+    <div class="card">
+      <p class="card-title">¿Qué deberías haber hecho?</p>
+      <ul class="check-list">
+        <li><span class="bullet bullet-green">✓</span>Verificar el origen del código QR antes de escanearlo</li>
+        <li><span class="bullet bullet-green">✓</span>No actuar ante mensajes con urgencia sospechosa</li>
+        <li><span class="bullet bullet-green">✓</span>Evitar escanear códigos en espacios públicos sin contexto claro</li>
+        <li><span class="bullet bullet-green">✓</span>Reportar al equipo de IT ante cualquier duda</li>
+      </ul>
+    </div>
 
-    <div id="success" class="success">✔ Reporte enviado</div>
+    <div class="card">
+      <p class="card-title">Señales de alerta</p>
+      <ul class="check-list">
+        <li><span class="bullet bullet-red">✕</span>Promesas de beneficios o premios inesperados</li>
+        <li><span class="bullet bullet-red">✕</span>Mensajes con urgencia o presión de tiempo</li>
+        <li><span class="bullet bullet-red">✕</span>Falta de identificación o logo oficial reconocible</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <p class="question-label">¿Por qué escaneaste?</p>
+      <div class="btn-group">
+        <button type="button" class="reason-btn" onclick="sendReason(this, 'Me pareció legítimo')">Me pareció legítimo</button>
+        <button type="button" class="reason-btn" onclick="sendReason(this, 'Tenía urgencia')">Tenía urgencia</button>
+        <button type="button" class="reason-btn" onclick="sendReason(this, 'Me llamó la atención')">Me llamó la atención</button>
+      </div>
+      <button type="button" class="report-btn" id="reportBtn" onclick="submitReport()">Reportar intento sospechoso</button>
+      <div class="success-msg" id="successMsg">
+        ✓ Reporte enviado correctamente. ¡Gracias por participar!
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Este ejercicio es parte del programa de concientización en seguridad de tu organización.
+    </div>
+
   </div>
 
-</div>
+  <div class="toast" id="toast"></div>
 
-<script>
-const endpoint = "https://formspree.io/f/xkopkkje";
+  <script>
+    const ENDPOINT = 'https://formspree.io/f/xkopkkje';
+    let selectedReason = 'No especificó';
 
-function getQR() {
-  return new URLSearchParams(window.location.search).get("qr") || "sin_qr";
-}
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show';
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => { t.className = 'toast'; }, 2800);
+    }
 
-function getFecha() {
-  return new Date().toISOString();
-}
+    function getFechaHora() {
+      const now = new Date();
+      return now.toLocaleDateString('es-AR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
 
-async function send(data) {
-  await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json"
-    },
-    body: JSON.stringify(data)
-  });
-}
+    function getQrOrigen() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('qr') || 'sin_origen';
+    }
 
-async function sendReason(btn, motivo) {
-  document.querySelectorAll("button").forEach(b => b.classList.remove("selected"));
-  btn.classList.add("selected");
+    async function sendToFormspree(payload) {
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
 
-  await send({
-    tipo: "motivo",
-    motivo: motivo,
-    qr: getQR(),
-    fecha: getFecha()
-  });
-}
+      if (!res.ok) {
+        throw new Error('Error al enviar a Formspree');
+      }
+    }
 
-async function sendReport() {
-  await send({
-    tipo: "reporte",
-    qr: getQR(),
-    fecha: getFecha()
-  });
+    async function sendReason(btn, label) {
+      document.querySelectorAll('.reason-btn').forEach(b => {
+        b.classList.remove('selected');
+      });
 
-  document.getElementById("success").style.display = "block";
-}
-</script>
+      btn.classList.add('selected');
+      selectedReason = label;
 
+      try {
+        await sendToFormspree({
+          tipo_evento: 'seleccion_motivo',
+          motivo: label,
+          fecha_hora: getFechaHora(),
+          origen_qr: getQrOrigen(),
+          evento: 'Simulación QR - Motivo seleccionado'
+        });
+
+        showToast('Respuesta registrada: ' + label);
+      } catch (e) {
+        showToast('Error al registrar la respuesta');
+      }
+    }
+
+    async function submitReport() {
+      const btn = document.getElementById('reportBtn');
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      try {
+        await sendToFormspree({
+          tipo_evento: 'reporte',
+          motivo: selectedReason,
+          fecha_hora: getFechaHora(),
+          origen_qr: getQrOrigen(),
+          evento: 'Simulación QR - Reporte enviado'
+        });
+
+        btn.style.display = 'none';
+        document.getElementById('successMsg').classList.add('show');
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = 'Reportar intento sospechoso';
+        showToast('Error al enviar. Intentá de nuevo.');
+      }
+    }
+  </script>
 </body>
 </html>
